@@ -340,5 +340,4 @@ if __name__ == '__main__':
         if name in ("-t", "--test"):
             send(get_config(), ['邮件功能测试正常'])
             break
-    print(__file__)
     sys.exit(0)
