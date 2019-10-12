@@ -71,30 +71,7 @@ def check_config(config: dict):
         logging.error('there is not account info')
         raise ConfigCheckError
 
-    crontab = config.get('crontab')
-    minute = crontab.get('minute')
-    hour = crontab.get('hour')  # 0~23
-    dayofmonth = crontab.get('dayofmonth')  # 1~31
-    month = crontab.get('month')  # 1~12
-    dayofweek = crontab.get('dayofweek')  # 0~7
-    try:
-        if minute != '*' and (int(minute) > 59 or int(minute)) < 0:
-            raise ConfigCheckError
-
-        if hour != '*' and (int(hour) > 23 or int(hour)) < 0:
-            raise ConfigCheckError
-
-        if dayofmonth != '*' and (int(dayofmonth) > 31 or int(dayofmonth)) < 0:
-            raise ConfigCheckError
-
-        if month != '*' and (int(month) > 12 or int(month)) < 0:
-            raise ConfigCheckError
-
-        if dayofweek != '*' and (int(dayofweek) > 7 or int(dayofweek)) < 0:
-            raise ConfigCheckError
-    except Exception:
-        logging.error('crontab configure error.')
-        raise
+    get_crontab_line()
 
 
 def get_mail_server(config: dict):
