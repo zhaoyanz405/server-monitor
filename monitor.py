@@ -202,21 +202,27 @@ def send(config, lines):
 def load_monitor():
     clear_monitor()
     print('load monitor start.')
-    cmd = r"sed -i '$a\python %s' " % __file__
+    cmd = r"sed -i '$a\python %s --monitor' /etc/crontab " % __file__
     try:
-        subprocess.run(args=cmd, check=True)
+        subprocess.run(args=cmd, check=True, shell=True)
     except subprocess.CalledProcessError:
-        print('load monitor to crondtab fail. the cmd is %s. pls retry by manual.' % cmd)
+        print('load monitor to crontab fail. the cmd is %s. pls retry by manual.' % cmd)
     print('load monitor done.')
 
 
 def clear_monitor():
     print('clear monitor start.')
-    cmd = r"sed -i '/python.*monitor/d' /etc/crondtab"
+
+    if not os.path.exists('/etc/crontab'):
+        print('/etc/crontab is not exists. will create it.')
+        subprocess.run(args='touch /etc/crontab', check=True, shell=True)
+
+    cmd = r"sed -i '/python.*monitor/d' /etc/crontab"
     try:
-        subprocess.run(args=cmd, check=True)
+        subprocess.run(args=cmd, check=True, shell=True)
     except subprocess.CalledProcessError:
-        print('clear monitor from crondtab fail. the cmd is %s. pls retry by manual.' % cmd)
+        print('clear monitor from crontab fail. the cmd is %s. pls retry by manual.' % cmd)
+
     print('clear monitor done.')
 
 
@@ -232,8 +238,8 @@ def usage():
         -h  --help 
         -t  --test      test the config, and send confirm email.
         -m  --monitor   run monitor once
-        -l  --load      load monitor to crondtab
-        -c  --clear     clear monitor from crondtab
+        -l  --load      load monitor to crontab
+        -c  --clear     clear monitor from crontab
         
         For more details see http://code.wenjuan.com/zhaoy/server-monitor.
 
