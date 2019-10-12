@@ -11,7 +11,7 @@ import os
 import subprocess
 import sys
 from datetime import datetime
-
+from crontab import CronTab
 import psutil
 import yaml
 
@@ -233,7 +233,15 @@ def get_crontab_line():
     dayofmonth = dayofmonth if dayofmonth else '*'
     month = month if month else '*'
     dayofweek = dayofweek if dayofweek else '*'
-    return "%s %s %s %s %s root python %s --monitor" % (minute, hour, dayofmonth, month, dayofweek, __file__)
+    try:
+        crontab = "%s %s %s %s %s" % (minute, hour, dayofmonth, month, dayofweek)
+        CronTab(crontab)
+    except Exception:
+        _error = 'crontab configure error.'
+        logger.error(_error)
+        raise ConfigCheckError(_error)
+
+    return "%s root python %s --monitor" % (crontab, __file__)
 
 
 def load_monitor():
