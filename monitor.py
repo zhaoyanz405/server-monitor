@@ -104,7 +104,13 @@ def check_cpu(config: dict):
     :return:
     """
     limit = config.get('limit')
-    percent = psutil.cpu_percent(interval=5)
+    interval = config.get('interval')
+    if interval:
+        interval = int(interval)
+    else:
+        interval = 5
+
+    percent = psutil.cpu_percent(interval=interval)
     if percent >= limit:
         cpu_times = psutil.cpu_times()
         msg = '当前1分钟内cpu使用情况：\n' \
@@ -247,12 +253,24 @@ def get_crontab_line():
 def load_monitor():
     clear_monitor()
     print('load monitor start.')
-    cmd = r"sed -i '$a\%s' /etc/crontab " % get_crontab_line()
 
     try:
+        cmd = r"sed -i '$a\%s' /etc/crontab " % get_crontab_line()
         subprocess.run(args=cmd, check=True, shell=True)
     except subprocess.CalledProcessError:
         print('load monitor to crontab fail. the cmd is %s. pls retry by manual.' % cmd)
+
+    try:
+        grep_cmd = r"grep -iE 'Debian|Ubuntu' /etc/os-release"
+        res = subprocess.run(args=grep_cmd, shell=True)
+        if res.returncode == 0:
+            cmd = "service cron restart"
+        else:
+            cmd = "service crond restart"
+
+        subprocess.run(args=cmd, shell=True, check=True)
+    except subprocess.CalledProcessError:
+        print('restart crontab service fail. the cmd is %s. pls retry by manual.' % cmd)
     print('load monitor done.')
 
 

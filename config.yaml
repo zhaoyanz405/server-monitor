@@ -22,8 +22,8 @@ crontab:
   dayofweek:  # 0~7
 
 monitor:
-  interval: 60
   cpu:
+    interval: 5
     limit: 0.6
 
   mem:
