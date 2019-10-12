@@ -246,7 +246,8 @@ def get_crontab_line():
         logger.error(_error)
         raise ConfigCheckError(_error)
 
-    return "%s root %s %s --monitor" % (crontab, config.get('python', '/usr/bin/python'), __file__)
+    return "%s root %s %s --monitor >> /home/monitor.log 2>&1" % (
+        crontab, config.get('python', '/usr/bin/python'), os.path.join(os.getcwd(), __file__))
 
 
 def load_monitor():
@@ -339,5 +340,5 @@ if __name__ == '__main__':
         if name in ("-t", "--test"):
             send(get_config(), ['邮件功能测试正常'])
             break
-
+    print(__file__)
     sys.exit(0)
