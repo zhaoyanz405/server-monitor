@@ -1,0 +1,28 @@
+server:
+  host: 'smtp.exmail.qq.com'
+  port: 25
+
+account:
+  user: 'no-reply.crspn@idiaoyan.com'
+  pass: 'Crspn123'
+
+mail:
+  subject: '科普所服务器监控信息'
+  from: '科普所监控小机器'
+  to:
+    - 'yan.zhao@idiaoyan.com'
+  cc:
+    - 'yan.zhao@idiaoyan.com'
+
+monitor:
+  interval: 60
+  cpu:
+    limit: 0.6
+
+  mem:
+    limit: 0.5
+
+#  process:
+#    - nginx
+#    - python
+#    - redis
