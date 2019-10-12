@@ -14,6 +14,7 @@ from datetime import datetime
 from crontab import CronTab
 import psutil
 import yaml
+import socket
 
 from ems import send_instant_mail, STATUS_MAIL_SEND_SUCCEED
 
@@ -172,7 +173,8 @@ def get_config():
 
 def monitoring():
     config = get_config()
-    lines = list()
+    hostname = socket.gethostname()
+    lines = ['hostname: %s' % hostname, 'ip: %s' % socket.gethostbyname(hostname)]
 
     for key, con in config.get('monitor').items():
         res, msg = eval('check_%s' % key)(con)
