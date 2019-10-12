@@ -113,12 +113,10 @@ def check_cpu(config: dict):
     percent = psutil.cpu_percent(interval=interval)
     if percent >= limit:
         cpu_times = psutil.cpu_times()
-        msg = '当前1分钟内cpu使用情况：\n' \
-              'cpu_percent：%.2f\n' \
-              'cpu_times: %s\n' % (percent, cpu_times)
-
-        return False, msg
-
+        infos = ['当前%s(s)内cpu使用情况：' % interval,
+                 'cpu_percent：%.2f' % percent,
+                 'cpu_times: %s <br>' % str(cpu_times)]
+        return False, '<br>'.join(infos)
     return True, None
 
 
@@ -132,13 +130,10 @@ def check_mem(config: dict):
     memory = psutil.virtual_memory()
     percent = memory.percent
     if percent >= limit:
-        msg = '当前1分钟内mem使用情况：\nprecent: %.2f\ntotal：%.2f\navailable: %.2f\nused: %.2f\n' \
-              'free: %.2f\nbuffers: %.2f\ncached: %.2f' % (memory.percent,
-                                                           memory.total / 1024 / 1024, memory.available / 1024 / 1024,
-                                                           memory.used / 1024 / 1024,
-                                                           memory.free / 1024 / 1024, memory.buffers / 1024 / 1024,
-                                                           memory.cached / 1024 / 1024)
-        return False, msg
+        infos = ["当前mem使用情况："]
+        for _m in ['percent', 'total', 'available', 'used', 'free', 'buffers', 'cached']:
+            infos.append('%s: %.2f G' % (_m, getattr(memory, _m)))
+        return False, "<br>".join(infos)
     return True, None
 
 
@@ -161,7 +156,7 @@ def check_process(config: dict):
             _errors.append('process %s is not active.' % p)
 
     if _errors:
-        return False, "\n".join(_errors)
+        return False, "<br>".join(_errors)
     return True, None
 
 
@@ -197,7 +192,7 @@ def send(config, lines):
     mail = config.get('mail')
     account = config.get('account')
     status = send_instant_mail(mail_server=mail_server, mail_from=account.get('user'), subject=mail.get('subject'),
-                               content='\n'.join(lines),
+                               content='<br>'.join(lines),
                                mail_to=mail.get('to'), copy_to=mail.get('cc'))
     if status == STATUS_MAIL_SEND_SUCCEED:
         print('[send email] success')
