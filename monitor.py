@@ -136,6 +136,29 @@ def check_mem(config: dict):
     return True, None
 
 
+def check_process(config: dict):
+    """
+
+    :param config:
+    :return:
+    """
+    process = config.get('process')
+    if not process:
+        logger.warning('no process need to be monitoring.')
+        return True, None
+
+    _errors = []
+    for p in process:
+        try:
+            subprocess.run('ps -ef | grep -v grep | grep %s ' % p, shell=True, check=True)
+        except subprocess.CalledProcessError:
+            _errors.append('process %s is not active.' % p)
+
+    if _errors:
+        return False, "\n".join(_errors)
+    return True, None
+
+
 def get_config():
     yaml_path = os.path.join(file_path, 'config.yaml')
     with open(yaml_path) as f:
