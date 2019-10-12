@@ -242,7 +242,7 @@ def get_crontab_line():
         logger.error(_error)
         raise ConfigCheckError(_error)
 
-    return "%s root python %s --monitor" % (crontab, __file__)
+    return "%s root %s %s --monitor" % (crontab, config.get('python', '/usr/bin/python'), __file__)
 
 
 def load_monitor():
