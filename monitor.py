@@ -230,9 +230,10 @@ def usage():
         python monitor.py [options]
         
         -h  --help 
-        -t  --test test the config, and send confirm email.
-        --start  run monitor
-        --stop   stop monitor
+        -t  --test      test the config, and send confirm email.
+        -m  --monitor   run monitor once
+        -l  --load      load monitor to crondtab
+        -c  --clear     clear monitor from crondtab
         
         For more details see http://code.wenjuan.com/zhaoy/server-monitor.
 
@@ -242,7 +243,7 @@ def usage():
 
 if __name__ == '__main__':
     try:
-        options, args = getopt.getopt(sys.argv[1:], "h:p:i:t", ["help", "start", "stop", "test"])
+        options, args = getopt.getopt(sys.argv[1:], "h:l:c:m:t", ["help", "load", "clear", "monitor", "test"])
     except getopt.GetoptError:
         usage()
         sys.exit(-1)
@@ -254,15 +255,15 @@ if __name__ == '__main__':
         if name in ("-h", "--help"):
             usage()
             break
-        if name == "--start":
+        if name in ("-l", "--load"):
             load_monitor()
             break
 
-        if name == '--stop':
+        if name in ("-c", "--clear"):
             clear_monitor()
             break
 
-        if name == '--monitor':
+        if name in ("-m", "--monitor"):
             monitoring()
             break
 
