@@ -22,6 +22,13 @@ monitor:
   mem:
     limit: 0.5
 
+crontab:
+  minute: 60  # 0~59
+  hour:    # 0~23
+  dayofmonth:   # 1~31
+  month:   # 1~12
+  dayofweek:  # 0~7
+
 #  process:
 #    - nginx
 #    - python

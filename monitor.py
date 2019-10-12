@@ -40,40 +40,60 @@ def check_config(config: dict):
     :param config:
     :return:
     """
+    server = config.get('server')
+    if not server:
+        logging.error('there is not server info')
+        raise ConfigCheckError
+
+    host, port = server.get('host'), server.get('port')
+    if not server or not host or not port:
+        logging.error('there is not server info')
+        raise ConfigCheckError
+
+    mail = config['mail']
+    if not mail:
+        logging.error('there is not mail info')
+        raise ConfigCheckError
+
+    mail_from = mail['from']
+    mail_to = mail['to']
+    if not mail or not mail_from or not mail_to:
+        logging.error('there is not mail info')
+        raise ConfigCheckError
+
+    account = config.get('account')
+    if not account:
+        logging.error('there is not account info')
+        raise ConfigCheckError
+
+    user, passwd = account['user'], account['pass']
+    if not user or not passwd:
+        logging.error('there is not account info')
+        raise ConfigCheckError
+
+    crontab = config.get('crontab')
+    minute = crontab.get('minute')
+    hour = crontab.get('hour')  # 0~23
+    dayofmonth = crontab.get('dayofmonth')  # 1~31
+    month = crontab.get('month')  # 1~12
+    dayofweek = crontab.get('dayofweek')  # 0~7
     try:
-        server = config.get('server')
-        if not server:
-            logging.error('there is not server info')
+        if minute != '*' and (int(minute) > 59 or int(minute)) < 0:
             raise ConfigCheckError
 
-        host, port = server.get('host'), server.get('port')
-        if not server or not host or not port:
-            logging.error('there is not server info')
+        if hour != '*' and (int(hour) > 23 or int(hour)) < 0:
             raise ConfigCheckError
 
-        mail = config['mail']
-        if not mail:
-            logging.error('there is not mail info')
+        if dayofmonth != '*' and (int(dayofmonth) > 31 or int(dayofmonth)) < 0:
             raise ConfigCheckError
 
-        mail_from = mail['from']
-        mail_to = mail['to']
-        if not mail or not mail_from or not mail_to:
-            logging.error('there is not mail info')
+        if month != '*' and (int(month) > 12 or int(month)) < 0:
             raise ConfigCheckError
 
-        account = config.get('account')
-        if not account:
-            logging.error('there is not account info')
+        if dayofweek != '*' and (int(dayofweek) > 7 or int(dayofweek)) < 0:
             raise ConfigCheckError
-
-        user, passwd = account['user'], account['pass']
-        if not user or not passwd:
-            logging.error('there is not account info')
-            raise ConfigCheckError
-
-    except KeyError:
-        logging.error('config error, pls check [account]')
+    except Exception:
+        logging.error('crontab configure error.')
         raise
 
 
@@ -199,10 +219,28 @@ def send(config, lines):
             STATUS_MAIL_UNEXPECTED_CODE_ERROR = 17  # 服务器返回其他错代码""")
 
 
+def get_crontab_line():
+    config = get_config()
+    crontab = config.get('crontab')
+    minute = crontab.get('minute')
+    hour = crontab.get('hour')  # 0~23
+    dayofmonth = crontab.get('dayofmonth')  # 1~31
+    month = crontab.get('month')  # 1~12
+    dayofweek = crontab.get('dayofweek')  # 0~7
+
+    minute = minute if minute else '*'
+    hour = hour if hour else '*'
+    dayofmonth = dayofmonth if dayofmonth else '*'
+    month = month if month else '*'
+    dayofweek = dayofweek if dayofweek else '*'
+    return "%s %s %s %s %s root python %s --monitor" % (minute, hour, dayofmonth, month, dayofweek, __file__)
+
+
 def load_monitor():
     clear_monitor()
     print('load monitor start.')
-    cmd = r"sed -i '$a\python %s --monitor' /etc/crontab " % __file__
+    cmd = r"sed -i '$a\%s' /etc/crontab " % get_crontab_line()
+
     try:
         subprocess.run(args=cmd, check=True, shell=True)
     except subprocess.CalledProcessError:
