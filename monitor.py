@@ -22,8 +22,12 @@ file_path = os.path.dirname(__file__)
 
 def get_logger():
     log_path = os.path.join(file_path, 'logs', 'monitor.%s.log' % datetime.now().strftime('%Y-%m-%d'))
-    logging.basicConfig(filename=log_path, level=logging.INFO,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    try:
+        logging.basicConfig(filename=log_path, level=logging.INFO,
+                            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    except FileNotFoundError:
+        os.mkdir(os.path.join(file_path, 'logs'))
+
     return logging.getLogger(__name__)
 
 
