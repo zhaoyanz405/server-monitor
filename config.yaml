@@ -31,7 +31,7 @@ monitor:
   mem:
     limit: 0.5
 
-process:
-  - nginx
-  - python
-  - redis
+  process:
+    - nginx
+    - python
+    - redis

@@ -141,13 +141,12 @@ def check_mem(config: dict):
     return True, None
 
 
-def check_process(config: dict):
+def check_process(process: list):
     """
 
-    :param config:
+    :param process:
     :return:
     """
-    process = config.get('process')
     if not process:
         logger.warning('no process need to be monitoring.')
         return True, None
@@ -340,5 +339,4 @@ if __name__ == '__main__':
         if name in ("-t", "--test"):
             send(get_config(), ['邮件功能测试正常'])
             break
-    print(__file__)
     sys.exit(0)
